@@ -22,6 +22,9 @@ test_requirements = [
 
 setup(
     name='bibletk',
+    entry_points = {
+        "console_scripts": [
+            "makepptx = bibletk.bibletk:main",]},
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description="Toolkit for bible",

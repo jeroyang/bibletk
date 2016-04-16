@@ -91,7 +91,8 @@ def translate_number(chinese_number):
     
     >>> translate_number('一百八十二')
     182
-    >>> translate_number(')
+    >>> translate_number('廿一')
+    21
     """
     pattern = r'((?P<hundred>.百)?)(?P<lesser_than_100>{})'.format('[一二三四五六七八九十廿卅]*')
     number = 0
