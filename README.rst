@@ -10,6 +10,7 @@ bibletk
 
 
 Toolkit for bible
+
 合和本聖經工具，給製作聖經經節簡報的辛苦同工。
 
 作者
@@ -19,21 +20,23 @@ Toolkit for bible
 使用方法
 --------
 * Installation
+
     $ pip install bibletk
 
 * Make Powerpoint
-將要作成聖經經節簡報的經文列表，存在一個純文字檔案中。
-如 input.txt：
 
-    創1:1-10
-    創世記一章11-18
-    出一1
+    將要作成聖經經節簡報的經文列表，存在一個純文字檔案中。 
+    如 input.txt：
 
-在命令列輸入
+        創1:1-10
+        創世記一章11-18
+        出一1
 
-    $ bibletk -i input.txt -o output.pptx
+    在命令列輸入
 
-程式會自動產生一個 output.pptx 其中有我們想要的經文
+        $ bibletk -i input.txt -o output.pptx
+
+    程式會自動產生一個 output.pptx 其中有我們想要的經文
 
 軟體授權
 -------
