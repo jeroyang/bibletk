@@ -4,9 +4,9 @@
 import versioneer
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
-    from distutils.core import setup
+    from distutils.core import setup, find_packages
 
 
 with open('README.rst') as readme_file:
@@ -31,13 +31,10 @@ setup(
     author="Chia-Jung, Yang",
     author_email='jeroyang@gmail.com',
     url='https://github.com/jeroyang/bibletk',
-    packages=[
-        'bibletk',
-        'data',
-    ],
-    package_dir={'bibletk': 'bibletk', 
-                 'data': 'data'},
-    package_data={'data': '*.txt'}
+    packages=find_packages(),
+#    package_dir={'bibletk': 'bibletk', 
+#                 'data': 'data'},
+    package_data={'data': ['*.txt']}, 
     include_package_data=True,
     install_requires=requirements,
     license="MIT",
