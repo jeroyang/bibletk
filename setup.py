@@ -12,9 +12,9 @@ except ImportError:
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-requirements = [
-    # TODO: put package requirements here
-]
+
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
 
 test_requirements = [
     # TODO: put package test requirements here
