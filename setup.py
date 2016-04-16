@@ -33,6 +33,7 @@ setup(
     url='https://github.com/jeroyang/bibletk',
     packages=[
         'bibletk',
+        'data',
     ],
     package_dir={'bibletk':
                  'bibletk'},
