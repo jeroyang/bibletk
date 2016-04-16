@@ -11,7 +11,7 @@ from txttk.retools import *
 import argparse
 from pptx import Presentation
 
-def load_bible_text(path='../data/hb5.txt'):
+def load_bible_text(path='hb5.txt'):
     """
     Load the bible_text data
     """
@@ -42,7 +42,7 @@ repository = build_repository(pharses)
 
 book_map = {}
 bookid2chinese = {}
-with open('../data/book_names.txt') as f:
+with open('book_names.txt') as f:
     for row in filter(lambda x: len(x)>3 and x[:4]!='中文卷名', f):
         chinese_long, chinese_short, engl_long, engl_short = row.strip().split('\t')
         the_map = {
