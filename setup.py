@@ -37,6 +37,7 @@ setup(
     ],
     package_dir={'bibletk': 'bibletk', 
                  'data': 'data'},
+    package_data={'data': '*.txt'}
     include_package_data=True,
     install_requires=requirements,
     license="MIT",
