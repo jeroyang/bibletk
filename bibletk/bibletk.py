@@ -10,12 +10,14 @@ import codecs
 from txttk.retools import *
 import argparse
 from pptx import Presentation
+import os.path
 
 def load_bible_text(path='hb5.txt'):
     """
     Load the bible_text data
     """
-    with codecs.open(path, encoding='big5', errors='ignore') as f:
+    new_path = os.path.join(os.path.dirname(__file__), path)
+    with codecs.open(new_path, encoding='big5', errors='ignore') as f:
         return f.read().strip()
 
 def parse_bible(bible_text):
@@ -37,24 +39,27 @@ def build_repository(pharses):
         repository[' '.join([book, locator])] = context
     return repository
 
+def load_bookmap_n_bookid2chinese(path='book_names.txt'):
+    new_path = os.path.join(os.path.dirname(__file__), path)
+    bookmap = {}
+    bookid2chinese = {}
+    with open(new_path) as f:
+        for row in filter(lambda x: len(x)>3 and x[:4]!='中文卷名', f):
+            chinese_long, chinese_short, engl_long, engl_short = row.strip().split('\t')
+            the_map = {
+                chinese_long: engl_short,
+                chinese_short: engl_short,
+                #engl_long: engl_short,
+                #engl_short: engl_short
+            }
+            bookmap.update(the_map)
+            bookid2chinese[engl_short] = chinese_long
+    return bookmap, bookid2chinese
+    
 pharses = parse_bible(load_bible_text())
 repository = build_repository(pharses)
 
-book_map = {}
-bookid2chinese = {}
-with open('book_names.txt') as f:
-    for row in filter(lambda x: len(x)>3 and x[:4]!='中文卷名', f):
-        chinese_long, chinese_short, engl_long, engl_short = row.strip().split('\t')
-        the_map = {
-            chinese_long: engl_short,
-            chinese_short: engl_short,
-            #engl_long: engl_short,
-            #engl_short: engl_short
-        }
-        book_map.update(the_map)
-        bookid2chinese[engl_short] = chinese_long
-
-
+book_map, bookid2chinese = load_bookmap_n_bookid2chinese()
 book_names = book_map.keys()
 bookname_regex = condense(book_names).replace('\\', '')
 locator_pattern = r'(?P<locator>[一二三四五六七八九十廿卅百\d:\-\,]+)'
@@ -221,7 +226,7 @@ def main(args):
 
 ########################
 
-
+"""
 if __name__ == '__main__':
     parser = argparse.ArgumentParser( 
         description = "From bible locators in a text file to generate a powerpoint file contains all the scripture.",
@@ -242,3 +247,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args)
+"""
