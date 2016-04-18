@@ -32,6 +32,9 @@ setup(
     author_email='jeroyang@gmail.com',
     url='https://github.com/jeroyang/bibletk',
     packages=find_packages(),
+    package_data={
+                'bibletk': ['hb5.txt', 'book_names.txt'],
+                },
     include_package_data=True,
     install_requires=requirements,
     license="MIT",
