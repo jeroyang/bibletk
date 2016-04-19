@@ -164,8 +164,14 @@ def get_context(book, chapter, pharse):
     """
     Given book, chapter, and pharse number, return the bible context.
     """
-    context = repository['{} {}:{}'.format(book, chapter, pharse)]
-    return context
+    try:
+        context = repository['{} {}:{}'.format(book, chapter, pharse)]
+        return context
+    except KeyError:
+        bookname = bookid2chinese[book]
+        pharse_name = '{}{}:{}'.format(bookname, chapter, pharse)
+        logging.warning('Cannot find this pharse:' + pharse_name)
+    
 
 def format_bucket(bucket):
     bookids = [pharse[0] for pharse in bucket]
