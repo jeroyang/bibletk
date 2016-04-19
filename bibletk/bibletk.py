@@ -11,6 +11,8 @@ from txttk.retools import *
 import argparse
 from pptx import Presentation
 import os.path
+import logging
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 
 def load_bible_text(path='hb5.txt'):
     """
@@ -212,34 +214,41 @@ def open_input(filename):
         
 def makepptx():
     parser = argparse.ArgumentParser( 
+        prog = "makepptx",
         description = "From bible locators in a text file to generate a powerpoint file contains all the scripture.",
         epilog = "As an alternative to the commandline, params can be placed in a file, one per line, and specified on the commandline like '%(prog)s @params.conf'.",
         fromfile_prefix_chars = '@' )
     # TODO Specify your real parameters here.
     parser.add_argument(
-                      "-i",
-                      "--input",
-                      help="the input text file",
-                      action="store")
+                      "input",
+                      help="the input text file"
+                      )
     parser.add_argument(
-                      "-o",
-                      "--output",
+                      "output",
                       help = "the output file ends with pptx",
-                      action="store")
+                      nargs='?'
+                      )
     
     args = parser.parse_args()
+    
     input_filename = args.input
     output_filename = args.output
-    
+    if output_filename is None:
+        output_filename = input_filename.rpartition('.')[0] + '.pptx'
+    elif not output_filename.endswith('.pptx'):
+        output_filename += '.pptx'
+        
     context = open_input(input_filename)
     pages = []
     for candidate in candidate_filter(context):
-        bucket = get_bucket(candidate)
-        page = format_bucket(bucket)
-        pages.append(page)
+        try:
+            bucket = get_bucket(candidate)
+            page = format_bucket(bucket)
+            pages.append(page)
+        except ValueError:
+            logging.warning('Wrong format: {}'.format(candidate.group(0)))
+        
     to_pptx(output_filename, pages)
-
-
 
 ########################
 
