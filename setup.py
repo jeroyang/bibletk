@@ -23,7 +23,7 @@ setup(
     name='bibletk',
     entry_points = {
         "console_scripts": [
-            "makepptx = bibletk.bibletk:main",]},
+            "makepptx = bibletk.bibletk:makepptx",]},
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description="Toolkit for bible",

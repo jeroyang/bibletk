@@ -210,23 +210,7 @@ def open_input(filename):
             text = f.read()
     return text
         
-def main(args):
-    input_filename = args.input
-    output_filename = args.output
-    
-    context = open_input(input_filename)
-    pages = []
-    for candidate in candidate_filter(context):
-        bucket = get_bucket(candidate)
-        page = format_bucket(bucket)
-        pages.append(page)
-    to_pptx(output_filename, pages)
-
-
-
-########################
-
-if __name__ == '__main__':
+def makepptx():
     parser = argparse.ArgumentParser( 
         description = "From bible locators in a text file to generate a powerpoint file contains all the scripture.",
         epilog = "As an alternative to the commandline, params can be placed in a file, one per line, and specified on the commandline like '%(prog)s @params.conf'.",
@@ -244,5 +228,20 @@ if __name__ == '__main__':
                       action="store")
     
     args = parser.parse_args()
+    input_filename = args.input
+    output_filename = args.output
+    
+    context = open_input(input_filename)
+    pages = []
+    for candidate in candidate_filter(context):
+        bucket = get_bucket(candidate)
+        page = format_bucket(bucket)
+        pages.append(page)
+    to_pptx(output_filename, pages)
 
-    main(args)
+
+
+########################
+
+if __name__ == '__main__':
+    makepptx()
