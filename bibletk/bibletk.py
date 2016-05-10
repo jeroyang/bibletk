@@ -10,6 +10,7 @@ import codecs
 from txttk.retools import *
 import argparse
 from pptx import Presentation
+import pyperclip
 import os.path
 import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
@@ -74,7 +75,7 @@ def candidate_filter(context):
     """
     Return the candidate from context
     """
-    pattern = '((?P<book>加(拉太書)?|士(師記)?|(耶利米哀|雅)?歌|約(翰福音|翰貳書|翰壹書|書亞記|翰參書|伯記|珥書|拿書|三|二|一)?|耶(利米書)?|啟(示錄)?|申(命記)?|(帖撒羅尼迦前|帖撒羅尼迦後|提摩太後|撒迦利亞|提摩太前|哥林多前|俄巴底亞|哥林多後|哈巴谷|彼得後|以西結|彼得前|西番雅|阿摩司|腓利門|腓利比|歌羅西|瑪拉基|以弗所|但以理|以賽亞|希伯來|何西阿|雅各|哈該|羅馬|那鴻|彌迦|猶大|提多|傳道)?書|路(加福音|得記)?|(使徒行)?傳|民(數記)?|利(未記)?|創(世記)?|尼(希米記)?|詩(篇)?|箴(言)?|出(埃及記)?|彌|得|伯|提前|來|撒母耳記下|以斯拉記|但|何|太|拉|腓|以斯帖記|歷代志上|歷代志下|王上|徒|賽|羅|彼前|代上|門|該|拿|林後|彼後|番|帖前|撒上|撒母耳記上|哈|亞|摩|斯|帖後|俄|鴻|代下|撒下|列王紀上|馬太福音|馬可福音|列王紀下|弗|猶|王下|瑪|多|提後|可|哀|雅|結|西|珥|林前))(?P<locator>[一二三四五六七八九十廿卅百\\d:\\-\\,]+)'
+    pattern = '((?P<out>.*?)(?P<book>加(拉太書)?|士(師記)?|(耶利米哀|雅)?歌|約(翰福音|翰貳書|翰壹書|書亞記|翰參書|伯記|珥書|拿書|三|二|一)?|耶(利米書)?|啟(示錄)?|申(命記)?|(帖撒羅尼迦前|帖撒羅尼迦後|提摩太後|撒迦利亞|提摩太前|哥林多前|俄巴底亞|哥林多後|哈巴谷|彼得後|以西結|彼得前|西番雅|阿摩司|腓利門|腓利比|歌羅西|瑪拉基|以弗所|但以理|以賽亞|希伯來|何西阿|雅各|哈該|羅馬|那鴻|彌迦|猶大|提多|傳道)?書|路(加福音|得記)?|(使徒行)?傳|民(數記)?|利(未記)?|創(世記)?|尼(希米記)?|詩(篇)?|箴(言)?|出(埃及記)?|彌|得|伯|提前|來|撒母耳記下|以斯拉記|但|何|太|拉|腓|以斯帖記|歷代志上|歷代志下|王上|徒|賽|羅|彼前|代上|門|該|拿|林後|彼後|番|帖前|撒上|撒母耳記上|哈|亞|摩|斯|帖後|俄|鴻|代下|撒下|列王紀上|馬太福音|馬可福音|列王紀下|弗|猶|王下|瑪|多|提後|可|哀|雅|結|西|珥|林前))(?P<locator>[一二三四五六七八九十廿卅百章\\d:\\-]+)'
     for m in re.finditer(pattern, context):
         yield m
 
@@ -171,8 +172,8 @@ def get_context(book, chapter, pharse):
         bookname = bookid2chinese[book]
         pharse_name = '{}{}:{}'.format(bookname, chapter, pharse)
         logging.warning('Cannot find this pharse:' + pharse_name)
+        raise KeyError('Cannot find this pharse')
     
-
 def format_bucket(bucket):
     bookids = [pharse[0] for pharse in bucket]
     assert len(set(bookids)) == 1
@@ -256,7 +257,35 @@ def makepptx():
         
     to_pptx(output_filename, pages)
 
+def text_expand(context):
+    """
+    Give context, pick out the bible indexes, turn them into normalized scripture, and put the scripture back into the context
+    """
+    output = []
+    end = 0
+    for m in candidate_filter(context):
+        output.append(m.group('out'))
+        try:
+            bucket = get_bucket(m)
+            formated = format_bucket(bucket)
+            output.extend(['《','：'.join(list(formated)), '》'])
+        except KeyError:
+            output.append(m.group(0))
+        except:
+            logging.waring(print(context))
+        end = m.end()
+    output.append(context[end:])
+    return ''.join(output)
+    
 ########################
 
 if __name__ == '__main__':
-    makepptx()
+    import pyperclip
+    cache = pyperclip.paste()
+    while True:
+
+        in_context = pyperclip.paste()
+        if in_context != cache:
+            out_context = text_expand(in_context)
+            pyperclip.copy(out_context)
+            cache = out_context

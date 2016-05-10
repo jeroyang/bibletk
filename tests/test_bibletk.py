@@ -21,7 +21,7 @@ class TestBibletk(unittest.TestCase):
 
     def test_candidate_filter(self):
         context = "約翰福音5:3-8 創世記三18 利8:1 民四:19"
-        results = [m.group(0) for m in bibletk.candidate_filter(context)]
+        results = [m.group('book')+m.group('locator') for m in bibletk.candidate_filter(context)]
         wanted = ['約翰福音5:3-8',
                   '創世記三18',
                   '利8:1',
@@ -100,5 +100,10 @@ class TestBibletk(unittest.TestCase):
         wanted = '太初有道、道與\u3000神同在、道就是\u3000神。'
         result = bibletk.get_context(book, chapter, pharse)
         self.assertEqual(result, wanted)
-        
+    
+    def test_text_expand(self):
+        context = '先創一1-2，然後創三1-2,結束'
+        wanted = '先《創世記1章：1起初　神創造天地。2地是空虛混沌．淵面黑暗．　神的靈運行在水面上。》，然後《創世記3章：1耶和華　神所造的、惟有蛇比田野一切的活物更狡猾。蛇對女人說、　神豈是真說、不許你們喫園中所有樹上的果子麼。2女人對蛇說、園中樹上的果子我們可以喫．》,結束'
+        result = bibletk.text_expand(context)
+        self.assertEqual(result, wanted)
         
