@@ -51,4 +51,4 @@ Toolkit for bible
 軟體授權
 -------
 * Free software: MIT license
-* Documentation: https://bibletk.readthedocs.org.
+* Documentation: https://github.com/jeroyang/bibletk
