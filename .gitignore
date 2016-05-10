@@ -1,6 +1,13 @@
 # OSX
 .DS_Store
 
+# configs
+.editorconfig
+.gitattributes
+
+# IPython/Jupyter
+.ipynb*
+
 # Python
 *.py[cod]
 
