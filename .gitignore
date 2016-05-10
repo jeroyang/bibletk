@@ -1,12 +1,14 @@
 # OSX
 .DS_Store
 
-# configs
+# Configs
 .editorconfig
 .gitattributes
+.python-version
+
 
 # IPython/Jupyter
-.ipynb*
+*.ipynb*
 
 # Python
 *.py[cod]
