@@ -20,9 +20,6 @@ test_requirements = [
 
 setup(
     name='bibletk',
-    entry_points = {
-        "console_scripts": [
-            "makepptx = bibletk.bibletk:makepptx",]},
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description="Toolkit for bible",
@@ -44,11 +41,7 @@ setup(
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
-        'Natural Language :: English',
-        "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
+        'Natural Language :: Traditional Chinese',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],

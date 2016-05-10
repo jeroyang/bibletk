@@ -1,5 +1,1 @@
-wheel==0.23.0
-future==0.15.2
-python-pptx==0.5.8
-txttk==0.3.4
 pyperclip==1.5.27

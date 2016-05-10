@@ -1,19 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-from builtins import *
-
 import re
 import codecs
-from txttk.retools import *
 import argparse
-from pptx import Presentation
 import pyperclip
 import os.path
 import logging
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 
 def load_bible_text(path='hb5.txt'):
     """
@@ -46,7 +40,7 @@ def load_bookmap_n_bookid2chinese(path='book_names.txt'):
     new_path = os.path.join(os.path.dirname(__file__), path)
     bookmap = {}
     bookid2chinese = {}
-    with open(new_path) as f:
+    with open(new_path, encoding='utf8') as f:
         for row in filter(lambda x: len(x)>3 and x[:4]!='中文卷名', f):
             chinese_long, chinese_short, engl_long, engl_short = row.strip().split('\t')
             the_map = {
@@ -64,9 +58,6 @@ repository = build_repository(pharses)
 
 book_map, bookid2chinese = load_bookmap_n_bookid2chinese()
 book_names = book_map.keys()
-bookname_regex = condense(book_names).replace('\\', '')
-locator_pattern = r'(?P<locator>[一二三四五六七八九十廿卅百\d:\-\,]+)'
-filter_pattern = concat(['(?P<book>{})'.format(bookname_regex), locator_pattern])
 
 def name_normalize(name):
     return book_map[name]
@@ -186,27 +177,6 @@ def format_bucket(bucket):
     body = ''.join(['{}{}'.format(p[2], get_context(*p)) for p in bucket])
     return header, body
     
-def to_pptx(filename, pages):
-    """
-    A page is a tuple of (title, text)
-    """
-    prs = Presentation()
-    bullet_slide_layout = prs.slide_layouts[1]
-    for page in pages:
-        
-        slide = prs.slides.add_slide(bullet_slide_layout)
-        shapes = slide.shapes
-
-        title_shape = shapes.title
-        body_shape = shapes.placeholders[1]
-
-        title_shape.text = page[0]
-
-        tf = body_shape.text_frame
-        tf.text = page[1]
-
-    prs.save(filename)
-    
 def open_input(filename):
     """
     Read the inputfile, try big5 and utf8 codecs
@@ -218,44 +188,6 @@ def open_input(filename):
         with codecs.open(filename, mode='r', encoding='big5') as f:
             text = f.read()
     return text
-        
-def makepptx():
-    parser = argparse.ArgumentParser( 
-        prog = "makepptx",
-        description = "From bible locators in a text file to generate a powerpoint file contains all the scripture.",
-        epilog = "As an alternative to the commandline, params can be placed in a file, one per line, and specified on the commandline like '%(prog)s @params.conf'.",
-        fromfile_prefix_chars = '@' )
-    # TODO Specify your real parameters here.
-    parser.add_argument(
-                      "input",
-                      help="the input text file"
-                      )
-    parser.add_argument(
-                      "output",
-                      help = "the output file ends with pptx",
-                      nargs='?'
-                      )
-    
-    args = parser.parse_args()
-    
-    input_filename = args.input
-    output_filename = args.output
-    if output_filename is None:
-        output_filename = input_filename.rpartition('.')[0] + '.pptx'
-    elif not output_filename.endswith('.pptx'):
-        output_filename += '.pptx'
-        
-    context = open_input(input_filename)
-    pages = []
-    for candidate in candidate_filter(context):
-        try:
-            bucket = get_bucket(candidate)
-            page = format_bucket(bucket)
-            pages.append(page)
-        except ValueError:
-            logging.warning('Wrong format: {}'.format(candidate.group(0)))
-        
-    to_pptx(output_filename, pages)
 
 def text_expand(context):
     """
@@ -272,7 +204,7 @@ def text_expand(context):
         except KeyError:
             output.append(m.group(0))
         except:
-            logging.waring(print(context))
+            logging.warning(print(context))
         end = m.end()
     output.append(context[end:])
     return ''.join(output)
