@@ -7,6 +7,9 @@ import argparse
 import pyperclip
 import os.path
 import logging
+import time
+import sys
+from functools import reduce
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 
 def load_bible_text(path='hb5.txt'):
@@ -66,37 +69,40 @@ def candidate_filter(context):
     """
     Return the candidate from context
     """
-    pattern = '((?P<out>.*?)(?P<book>加(拉太書)?|士(師記)?|(耶利米哀|雅)?歌|約(翰福音|翰貳書|翰壹書|書亞記|翰參書|伯記|珥書|拿書|三|二|一)?|耶(利米書)?|啟(示錄)?|申(命記)?|(帖撒羅尼迦前|帖撒羅尼迦後|提摩太後|撒迦利亞|提摩太前|哥林多前|俄巴底亞|哥林多後|哈巴谷|彼得後|以西結|彼得前|西番雅|阿摩司|腓利門|腓利比|歌羅西|瑪拉基|以弗所|但以理|以賽亞|希伯來|何西阿|雅各|哈該|羅馬|那鴻|彌迦|猶大|提多|傳道)?書|路(加福音|得記)?|(使徒行)?傳|民(數記)?|利(未記)?|創(世記)?|尼(希米記)?|詩(篇)?|箴(言)?|出(埃及記)?|彌|得|伯|提前|來|撒母耳記下|以斯拉記|但|何|太|拉|腓|以斯帖記|歷代志上|歷代志下|王上|徒|賽|羅|彼前|代上|門|該|拿|林後|彼後|番|帖前|撒上|撒母耳記上|哈|亞|摩|斯|帖後|俄|鴻|代下|撒下|列王紀上|馬太福音|馬可福音|列王紀下|弗|猶|王下|瑪|多|提後|可|哀|雅|結|西|珥|林前))(?P<locator>[一二三四五六七八九十廿卅百章\\d:\\-]+)'
+    pattern = '(?s)((?P<out>.*?)(?P<book>加(拉太書)?|士(師記)?|(耶利米哀|雅)?歌|約(翰福音|翰貳書|翰壹書|書亞記|翰參書|伯記|珥書|拿書|三|二|一)?|耶(利米書)?|啟(示錄)?|申(命記)?|(帖撒羅尼迦前|帖撒羅尼迦後|提摩太後|撒迦利亞|提摩太前|哥林多前|俄巴底亞|哥林多後|哈巴谷|彼得後|以西結|彼得前|西番雅|阿摩司|腓利門|腓利比|歌羅西|瑪拉基|以弗所|但以理|以賽亞|希伯來|何西阿|雅各|哈該|羅馬|那鴻|彌迦|猶大|提多|傳道)?書|路(加福音|得記)?|(使徒行)?傳|民(數記)?|利(未記)?|創(世記)?|尼(希米記)?|詩(篇)?|箴(言)?|出(埃及記)?|彌|得|伯|提前|來|撒母耳記下|以斯拉記|但|何|太|拉|腓|以斯帖記|歷代志上|歷代志下|王上|徒|賽|羅|彼前|代上|門|該|拿|林後|彼後|番|帖前|撒上|撒母耳記上|哈|亞|摩|斯|帖後|俄|鴻|代下|撒下|列王紀上|馬太福音|馬可福音|列王紀下|弗|猶|王下|瑪|多|提後|可|哀|雅|結|西|珥|林前))(?P<locator>[〇一二三四五六七八九十廿卅百章\\d:\\-]+)節?'
     for m in re.finditer(pattern, context):
         yield m
 
-number_map = {'一':1, 
-            '二':2, 
-            '三':3, 
-            '四':4, 
-            '五':5, 
-            '六':6, 
-            '七':7, 
-            '八':8, 
-            '九':9, 
-            '十':10, 
-            '廿':20, 
-            '卅':30, 
-            '百':100, }
+number_map = {  '〇': 0,
+                '一': 1, 
+                '二': 2, 
+                '三': 3, 
+                '四': 4, 
+                '五': 5, 
+                '六': 6, 
+                '七': 7, 
+                '八': 8, 
+                '九': 9, 
+                '十': 10, 
+                '廿': 20, 
+                '卅': 30, 
+                '百': 100, }
 
-def translate_number(chinese_number): 
+def multiple_replace(text, replace_pairs):
+    return reduce(lambda t, item: t.replace(*item), replace_pairs, text)
+
+def interpret_official(chinese_number):
     """
-    Translate chinese number less than 999 into int
+    Interpret chinese number less than 999 into int
     
-    >>> translate_number('一百八十二')
+    >>> interpret_official('一百八十二')
     182
-    >>> translate_number('廿一')
-    21
+    >>> interpret_official('廿三')
+    23
     """
     pattern = r'((?P<hundred>.百)?)(?P<lesser_than_100>{})'.format('[一二三四五六七八九十廿卅]*')
     number = 0
     m = re.match(pattern, chinese_number)
-
     if m.group('hundred'):
         number += number_map[m.group('hundred')[0]] * 100
     lesser_than_100 = m.group('lesser_than_100')
@@ -107,6 +113,33 @@ def translate_number(chinese_number):
     if m.group('one'):
         number += sum([number_map[char] for char in m.group('one')])
     return number
+
+def interpret_sequential(chinese_number):
+    """
+    Interpret sequential chinese number into int
+    
+    >>> interpret_sequential('一〇二')
+    102
+    """
+    replace_pair = [(key, str(number_map[key])) for key in '〇一二三四五六七八九']
+    return int(multiple_replace(chinese_number, replace_pair))
+
+def translate_number(chinese_number): 
+    """
+    Translate any kind of chinese numbers (less than 999) into int
+    
+    >>> translate_number('一百八十二')
+    182
+    >>> translate_number('一八二')
+    182
+    """
+    if any(['十' in chinese_number, 
+           '廿' in chinese_number,
+           '卅' in chinese_number,
+           '百' in chinese_number]):
+        return interpret_official(chinese_number)
+    else:
+        return interpret_sequential(chinese_number)
 
 def spliter(re_match_from_filter):
     """
@@ -132,7 +165,7 @@ def parse_locator(locator):
     """
     Parse given locator such as '一5', '5章2-3'
     """
-    pattern = r'(?:(?P<number>\d+)|(?P<chinese>[一二三四五六七八九十廿卅百]+))[章:]?(?P<pharse_range>[\d,\-]+)'
+    pattern = r'(?:(?P<number>\d+)|(?P<chinese>[〇一二三四五六七八九十廿卅百]+))[章:]?(?P<pharse_range>[\d,\-]+)'
     m = re.match(pattern, locator)
     if m.group('number'):
         chapter = int(m.group('number'))
@@ -203,6 +236,8 @@ def text_expand(context):
             output.extend(['《','：'.join(list(formated)), '》'])
         except KeyError:
             output.append(m.group(0))
+        except AttributeError:
+            output.append(m.group(0))
         except:
             logging.warning(print(context))
         end = m.end()
@@ -214,10 +249,14 @@ def text_expand(context):
 if __name__ == '__main__':
     import pyperclip
     cache = pyperclip.paste()
+    start_flag = True
     while True:
-
         in_context = pyperclip.paste()
-        if in_context != cache:
+        if in_context == 'STOP' and not start_flag:
+            sys.exit(0)
+        elif in_context != cache:
+            start_flag = False
             out_context = text_expand(in_context)
             pyperclip.copy(out_context)
             cache = out_context
+        time.sleep(0.1)
