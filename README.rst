@@ -21,8 +21,9 @@ Toolkit for bible
 使用方法
 --------
 * Installation
-
-    下載 zip檔，解壓縮到任何地方。
+    
+    下載 bibletk-windows.zip_ 檔
+    解壓縮到任何地方。
 
 * 開始軟體
     執行 bibletk.exe，現在你的剪貼簿就變身成聖經剪貼簿了。
@@ -54,3 +55,5 @@ Toolkit for bible
 -------
 * Free software: MIT license
 * Documentation: https://github.com/jeroyang/bibletk
+
+.. _bibletk-windows.zip: https://github.com/jeroyang/bibletk/blob/master/excutable/bibletk-windows.zip
