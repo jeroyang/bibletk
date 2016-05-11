@@ -20,7 +20,7 @@ Toolkit for bible
 
 使用方法
 --------
-* Installation
+* 安裝在 Windows
     
     下載 bibletk-windows.zip_ 檔
     解壓縮到任何地方。
