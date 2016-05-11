@@ -5,7 +5,7 @@
 .editorconfig
 .gitattributes
 .python-version
-
+*.spec
 
 # IPython/Jupyter
 *.ipynb*
