@@ -56,4 +56,4 @@ Toolkit for bible
 * Free software: MIT license
 * Documentation: https://github.com/jeroyang/bibletk
 
-.. _bibletk-windows.zip: https://github.com/jeroyang/bibletk/blob/master/excutable/bibletk-windows.zip
+.. _bibletk-windows.zip: https://github.com/jeroyang/bibletk/blob/master/excutable/bibletk-windows.zip?raw=true
